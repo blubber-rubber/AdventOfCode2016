@@ -1,4 +1,5 @@
 import time
+from itertools import permutations
 
 start_time = time.time()
 
@@ -34,6 +35,15 @@ def move(lijst: list, x, y):
 def rotation_based(lijst, s):
     i = lijst.index(s)
     return rotate_right(lijst, 1 + i + (i >= 4))
+
+
+def inverse_rotation_based(lijst, s):
+    i = lijst.index(s)
+    x = 0
+    while (2 * x + 1 + (x >= 4)) % len(lijst) != i:
+        x += 1
+
+    return rotate_left(lijst, (i - x) % len(lijst))
 
 
 def reverse(lijst, x, y):
@@ -72,16 +82,17 @@ scramble = list('abcdefgh')
 # scramble = rotation_based(scramble, 'd')
 # print(scramble)
 
-patterns = list({'rotate right (.*) steps?': rotate_right,
+patterns = list({'rotate right (.*) steps?': rotate_left,
                  'swap letter (.*) with letter (.*)': swap_letters,
-                 'move position (.*) to position (.*)': move,
+                 'move position (.*) to position (.*)': lambda x, y, z: move(x, z, y),
                  'swap position (.*) with position (.*)': swap,
-                 'rotate based on position of letter (.*)': rotation_based,
+                 'rotate based on position of letter (.*)': inverse_rotation_based,
                  'reverse positions (.*) through (.*)': reverse,
-                 'rotate left (.*) steps?': rotate_left
+                 'rotate left (.*) steps?': rotate_right
                  }.items())
 
-for line in lines:
+scramble = list('fbgdceah')
+for line in lines[::-1]:
     index = 0
     m = None
     print(line)
